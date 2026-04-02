@@ -1,0 +1,48 @@
+/* ============ LANGUAGE SWITCHER ============ */
+
+.language-switcher {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.3rem;
+  backdrop-filter: blur(10px);
+}
+
+.lang-btn {
+  padding: 0.4rem 0.8rem;
+  border: 2px solid transparent;
+  background-color: transparent;
+  color: #8B6F47;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.lang-btn:hover {
+  background-color: rgba(212, 165, 116, 0.1);
+  border-color: #D4A574;
+}
+
+.lang-btn.active {
+  background-color: #D4A574;
+  color: white;
+  border-color: #D4A574;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 480px) {
+  .language-switcher {
+    gap: 0.3rem;
+    padding: 0.2rem;
+  }
+
+  .lang-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}

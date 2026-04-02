@@ -1,0 +1,117 @@
+/* ============ MODAL STYLES ============ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.confirm-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 2px solid #D4A574;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirm-modal h3 {
+  color: #6B4321;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.confirm-modal p {
+  color: #8B6F47;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-modal-primary,
+.btn-modal-secondary,
+.btn-modal-danger {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.btn-modal-primary {
+  background-color: #D4A574;
+  color: white;
+}
+
+.btn-modal-primary:hover {
+  background-color: #C9AE7C;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
+
+.btn-modal-secondary {
+  background-color: transparent;
+  color: #6B4321;
+  border: 2px solid #D4A574;
+}
+
+.btn-modal-secondary:hover {
+  background-color: #F5F3F0;
+}
+
+.btn-modal-danger {
+  background-color: #C45858;
+  color: white;
+}
+
+.btn-modal-danger:hover {
+  background-color: #a84444;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(196, 88, 88, 0.3);
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 480px) {
+  .confirm-modal {
+    padding: 1.5rem;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-modal-primary,
+  .btn-modal-secondary,
+  .btn-modal-danger {
+    width: 100%;
+  }
+}
