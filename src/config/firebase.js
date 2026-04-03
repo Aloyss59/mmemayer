@@ -5,12 +5,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD3vnVNvRoRT-ZrBw6nv_lDv05Lutfzh6w",
-  authDomain: "maison-concours-6cc41.firebaseapp.com",
-  projectId: "maison-concours-6cc41",
-  storageBucket: "maison-concours-6cc41.firebasestorage.app",
-  messagingSenderId: "670111254798",
-  appId: "1:670111254798:web:a859136a761ea67ce52f5f"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialiser Firebase
