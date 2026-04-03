@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/Modal.css';
 
-function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmText = 'Confirmer', cancelText = 'Annuler', isDanger = false }) {
+function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmText, cancelText, isDanger = false }) {
   if (!isOpen) return null;
 
   return (

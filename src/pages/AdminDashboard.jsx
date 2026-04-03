@@ -94,7 +94,7 @@ function AdminDashboard() {
       setProfessors([...professors, { id: profId, ...profData }]);
       setFormData({ firstName: '', lastName: '', password: '', passwordConfirm: '' });
       setShowCreateForm(false);
-      setToast({ message: `✅ Professeur ${uniqueUsername} nommé.`, type: 'success' });
+      setToast({ message: t('success_created'), type: 'success' });
     } catch (error) {
       setFormError(error.message);
     } finally {
@@ -105,7 +105,7 @@ function AdminDashboard() {
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (!newPassword || newPassword.length < 6) {
-      setToast({ message: "Le mot de passe doit faire au moins 6 caractères.", type: 'error' });
+      setToast({ message: t('form_password_too_short'), type: 'error' });
       return;
     }
     try {
@@ -114,9 +114,9 @@ function AdminDashboard() {
       setProfessors(professors.map(p => p.id === editingPasswordId ? { ...p, password: newPassword } : p));
       setEditingPasswordId(null);
       setNewPassword('');
-      setToast({ message: "Le mot de passe a été mis à jour avec succès.", type: 'success' });
+      setToast({ message: t('success_points_updated'), type: 'success' });
     } catch (error) {
-      setToast({ message: "Erreur lors de la mise à jour.", type: 'error' });
+      setToast({ message: t('error'), type: 'error' });
     }
   };
 
@@ -127,10 +127,6 @@ function AdminDashboard() {
       if (type === 'PROFESSOR') {
         // 1. Supprimer le document utilisateur
         await deleteDoc(doc(db, 'users', id));
-        
-        // Note: On pourrait aussi supprimer toutes les classes de ce prof, 
-        // mais c'est plus sûr de le laisser faire manuellement pour éviter les wipes accidentels massifs.
-        
         setProfessors(professors.filter(p => p.id !== id));
       } else {
         // 1. Supprimer le document de la Classe
@@ -155,10 +151,10 @@ function AdminDashboard() {
       }
       
       setConfirmModal({ isOpen: false, type: '', id: null });
-      setToast({ message: "Suppression totale effectuée avec succès.", type: 'success' });
+      setToast({ message: t('success_deleted'), type: 'success' });
     } catch (error) {
       console.error("Erreur suppression cascade:", error);
-      setToast({ message: "Échec de la suppression complète.", type: 'error' });
+      setToast({ message: t('error_deleted'), type: 'error' });
     }
   };
 
@@ -175,13 +171,13 @@ function AdminDashboard() {
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading || dashboardLoading) return <div className="dashboard loading" style={{textAlign: 'center', padding: '10rem'}}>Chargement...</div>;
+  if (loading || dashboardLoading) return <div className="dashboard loading" style={{textAlign: 'center', padding: '10rem'}}>{t('loading')}</div>;
 
   return (
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="header-logo">
-          <span className="header-page-title">Page d'accueil</span>
+          <span className="header-page-title">{getTranslation(language, 'professor', 'home')}</span>
         </div>
         <div className="header-actions">
           <LanguageSwitcher />
@@ -197,27 +193,27 @@ function AdminDashboard() {
             className={`tab-btn ${currentView === 'PROFESSORS' ? 'active' : ''}`}
             onClick={() => { setCurrentView('PROFESSORS'); setSearchTerm(''); }}
           >
-            Gestion du Corps Enseignant
+            {t('professors_title')}
           </button>
           <button 
             className={`tab-btn ${currentView === 'CLASSES' ? 'active' : ''}`}
             onClick={() => { setCurrentView('CLASSES'); setSearchTerm(''); }}
           >
-            Archives des Classes
+            {getTranslation(language, 'professor', 'my_classes')}
           </button>
         </div>
 
         {/* Global Stats bar */}
         <div className="rectorat-stats-bar">
-          <div className="stat-pill"><strong>{professors.length}</strong> Enseignants</div>
-          <div className="stat-pill"><strong>{classes.length}</strong> Classes</div>
+          <div className="stat-pill"><strong>{professors.length}</strong> {t('professors_count')}</div>
+          <div className="stat-pill"><strong>{classes.length}</strong> {t('classes_count')}</div>
         </div>
 
         {/* Barre de recherche unifiée */}
         <div className="rectorat-search-container">
           <input 
             type="text" 
-            placeholder={currentView === 'PROFESSORS' ? "Rechercher un professeur (Nom, Prénom, Username)..." : "Rechercher une classe..."}
+            placeholder={currentView === 'PROFESSORS' ? t('no_professors') : getTranslation(language, 'professor', 'class_name')}
             className="registry-search-bar"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -226,17 +222,17 @@ function AdminDashboard() {
         {currentView === 'PROFESSORS' ? (
           <section className="academic-registry-card">
             <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h2 className="section-title-handwritten">Liste du Corps Enseignant</h2>
-              <button onClick={() => setShowCreateForm(true)} className="btn-primary">+ Nommer un Professeur</button>
+              <h2 className="section-title-handwritten">{t('professors_title')}</h2>
+              <button onClick={() => setShowCreateForm(true)} className="btn-primary">{t('create_professor')}</button>
             </div>
 
             <table className="table-registry">
               <thead>
                 <tr>
-                  <th>Enseignant</th>
-                  <th>Identifiant</th>
-                  <th>Mot de passe</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th>{getTranslation(language, 'professor', 'house_label')}</th>
+                  <th>{getTranslation(language, 'professor', 'username_label')}</th>
+                  <th>{getTranslation(language, 'login', 'password')}</th>
+                  <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -244,7 +240,7 @@ function AdminDashboard() {
                   <tr key={prof.id}>
                     <td>
                       <div style={{ fontWeight: '800' }}>{prof.firstName} {prof.lastName}</div>
-                      <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Recruté le {new Date(prof.createdAt?.toDate?.() || prof.createdAt).toLocaleDateString('fr-FR')}</div>
+                      <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{t('created_date')} {new Date(prof.createdAt?.toDate?.() || prof.createdAt).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')}</div>
                     </td>
                     <td><code style={{ background: '#EEE', padding: '2px 6px', borderRadius: '4px' }}>{prof.username}</code></td>
                     <td>
@@ -261,7 +257,7 @@ function AdminDashboard() {
                             className="btn-header" 
                             style={{ fontSize: '0.7rem', padding: '4px 8px', background: 'var(--sable-header)' }}
                           >
-                            Modifier
+                            {getTranslation(language, 'professor', 'custom')}
                           </button>
                         )}
                       </div>
@@ -272,13 +268,13 @@ function AdminDashboard() {
                           isOpen: true, 
                           type: 'PROFESSOR', 
                           id: prof.id,
-                          title: 'Supprimer un Enseignant',
-                          message: `Voulez-vous vraiment révoquer les accès de ${prof.firstName} ${prof.lastName} ?`
+                          title: t('delete_professor'),
+                          message: t('delete_professor_message')
                         })} 
                         className="btn-inline-x" 
                         style={{ width: 'auto', padding: '6px 12px', fontSize: '0.8rem' }}
                       >
-                        Révoquer
+                        {t('delete')}
                       </button>
                     </td>
                   </tr>
@@ -298,16 +294,16 @@ function AdminDashboard() {
                         isOpen: true, 
                         type: 'CLASS', 
                         id: cls.id,
-                        title: 'Supprimer la Classe',
-                        message: `Voulez-vous vraiment archiver définitivement la classe "${cls.name}" ?`
+                        title: getTranslation(language, 'professor', 'delete_class_confirm'),
+                        message: getTranslation(language, 'professor', 'delete_class_message')
                       })} 
                       className="btn-inline-x" 
                       style={{ padding: '5px 10px', background: 'none', color: 'var(--accent-red-brick)', border: '1px solid transparent' }}
                     >
-                      Supprimer
+                      {t('delete')}
                     </button>
                   </div>
-                  <div style={{ fontSize: '0.9rem', color: '#888' }}>{cls.houseNames?.length || 0} Maisons enregistrées</div>
+                  <div style={{ fontSize: '0.9rem', color: '#888' }}>{cls.houseNames?.length || 0} {getTranslation(language, 'professor', 'houses_label')}</div>
                 </div>
 
                 <div className="house-summary-mini" style={{ display: 'flex', gap: '10px', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
@@ -332,7 +328,7 @@ function AdminDashboard() {
                     className="btn-header" 
                     style={{ flex: 1, background: 'var(--sable-header)', fontSize: '0.85rem' }}
                   >
-                    Gérer la Classe →
+                    {getTranslation(language, 'professor', 'leaderboard')} →
                   </button>
                 </div>
               </div>
@@ -347,31 +343,31 @@ function AdminDashboard() {
         <div className="modal-letter-overlay" style={{ zIndex: 3000 }}>
           <div className="registration-fiche-vintage" style={{ maxWidth: '500px', width: '95%' }}>
             <div className="fiche-header-academic">
-              <span>Fiche de Nomination Enseignante</span>
+              <span>{t('create_professor')}</span>
             </div>
             <form onSubmit={handleCreateProfessor} className="fiche-body-academic" style={{ padding: '2.5rem' }}>
               <div className="flex-column">
                 <div className="input-field-buvard">
-                  <label>Prénom</label>
+                  <label>{t('form_first_name')}</label>
                   <input type="text" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} required />
                 </div>
                 <div className="input-field-buvard">
-                  <label>Nom de famille</label>
+                  <label>{t('form_last_name')}</label>
                   <input type="text" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} required />
                 </div>
                 <div className="input-field-buvard">
-                  <label>Mot de passe (provisoire)</label>
+                  <label>{t('form_password')}</label>
                   <input type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} required />
                 </div>
                 <div className="input-field-buvard">
-                  <label>Confirmer le mot de passe</label>
+                  <label>{t('form_password_confirm')}</label>
                   <input type="password" value={formData.passwordConfirm} onChange={e => setFormData({...formData, passwordConfirm: e.target.value})} required />
                 </div>
               </div>
               {formError && <p style={{ color: 'var(--accent-red-brick)', marginTop: '1rem', fontSize: '0.9rem' }}>{formError}</p>}
               <div className="fiche-actions-vintage" style={{ marginTop: '2.5rem' }}>
-                <button type="button" onClick={() => setShowCreateForm(false)} className="btn-cancel-neutral">Annuler</button>
-                <button type="submit" className="btn-confirm-gold" disabled={formLoading}>Nommer l'Enseignant</button>
+                <button type="button" onClick={() => setShowCreateForm(false)} className="btn-cancel-neutral">{t('cancel')}</button>
+                <button type="submit" className="btn-confirm-gold" disabled={formLoading}>{t('create_button')}</button>
               </div>
             </form>
           </div>
@@ -390,14 +386,14 @@ function AdminDashboard() {
                 className="btn-cancel-neutral" 
                 style={{ flex: 1 }}
               >
-                Annuler
+                {t('cancel')}
               </button>
               <button 
                 onClick={confirmDeleteAction} 
                 className="btn-delete-confirmed" 
                 style={{ flex: 1 }}
               >
-                Confirmer
+                {t('delete_confirm')}
               </button>
             </div>
           </div>

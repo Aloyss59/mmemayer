@@ -92,7 +92,7 @@ function ProfessorDashboard() {
     // Sécurité Anti-Doublon (Scope Professeur)
     const isDuplicate = classes.some(c => c.name.toLowerCase() === className.toLowerCase() && c.professorId === user.uid);
     if (isDuplicate) {
-      setToast({ message: 'Une classe porte déjà ce nom dans votre registre', type: 'error' });
+      setToast({ message: t('error_creation'), type: 'error' });
       return;
     }
 
@@ -112,8 +112,8 @@ function ProfessorDashboard() {
       setClassName('');
       setShowNewClassForm(false);
       selectClass(createdClass); // Sélectionner la nouvelle classe immédiatement
-      setToast({ message: 'Nouvelle classe scellée !', type: 'success' });
-    } catch (err) { setToast({ message: 'Erreur lors de la création', type: 'error' }); }
+      setToast({ message: t('success_class_created'), type: 'success' });
+    } catch (err) { setToast({ message: t('error_creation'), type: 'error' }); }
   };
 
   const updateHouseCount = (count) => {
@@ -122,7 +122,7 @@ function ProfessorDashboard() {
     const newHouses = [...houses];
     if (val > houses.length) {
       for (let i = houses.length; i < val; i++) {
-        newHouses.push({ name: `Maison ${i + 1}`, color: '#D4A574' });
+        newHouses.push({ name: `${t('house_label')} ${i + 1}`, color: '#D4A574' });
       }
     } else {
       newHouses.splice(val);
@@ -161,11 +161,11 @@ function ProfessorDashboard() {
       
       const newStudent = { id: studentId, firstName: studentFirstName, lastName: studentName, ...studentData };
       setStudents([...students, newStudent]);
-      setToast({ message: 'Élève ajouté', type: 'success' });
+      setToast({ message: t('success_student_added'), type: 'success' });
       setStudentName('');
       setStudentFirstName('');
     } catch (error) {
-      setToast({ message: 'Erreur: ' + error.message, type: 'error' });
+      setToast({ message: t('error_add_student') + ': ' + error.message, type: 'error' });
     }
   };
 
@@ -174,9 +174,9 @@ function ProfessorDashboard() {
       await deleteDoc(doc(db, 'students', studentId));
       await deleteDoc(doc(db, 'users', studentId));
       setStudents(students.filter(s => s.id !== studentId));
-      setToast({ message: 'Dossier supprimé', type: 'success' });
+      setToast({ message: t('success_student_deleted'), type: 'success' });
     } catch (error) {
-      setToast({ message: 'Erreur', type: 'error' });
+      setToast({ message: t('error'), type: 'error' });
     }
   };
 
@@ -208,10 +208,10 @@ function ProfessorDashboard() {
       setClasses(classes.filter(c => c.id !== classId));
       setSelectedClass(null);
       setShowDeleteConfirm(false);
-      setToast({ message: 'La promotion et tous ses dossiers ont été dissous', type: 'success' });
+      setToast({ message: t('success_class_dissolved'), type: 'success' });
     } catch (error) {
       console.error("Erreur suppression cascade prof:", error);
-      setToast({ message: 'Erreur lors de la dissolution complète', type: 'error' });
+      setToast({ message: t('error_deleted'), type: 'error' });
     }
   };
 
@@ -235,16 +235,16 @@ function ProfessorDashboard() {
         houseIndex,
         houseName: selectedClass.houseNames[houseIndex],
         points,
-        justification: justification || (points > 0 ? "Bonus" : "Sanction"),
+        justification: justification || (points > 0 ? t('bonus') : t('sanction')),
         timestamp: new Date(),
         professorId: user.uid
       });
       
       setSelectedClass({ ...selectedClass, housePoints: newPoints });
-      setToast({ message: 'Grimoire mis à jour', type: 'success' });
+      setToast({ message: t('success_points_updated'), type: 'success' });
       setPointModal({ isOpen: false, houseIndex: null, points: 0, justification: '' });
     } catch (error) {
-      setToast({ message: 'Erreur', type: 'error' });
+      setToast({ message: t('error'), type: 'error' });
     }
   };
 
@@ -257,7 +257,7 @@ function ProfessorDashboard() {
     setInlinePoints({ ...inlinePoints, [idx]: '' });
   };
 
-  const handleGeneratePDF = () => generatePDF(selectedClass, students);
+  const handleGeneratePDF = () => generatePDF(selectedClass, students, language);
   const handleLogout = async () => { await logout(); navigate('/'); };
 
   const getGridCols = (count) => {
@@ -268,13 +268,13 @@ function ProfessorDashboard() {
     return 4;
   };
 
-  if (loading || dashboardLoading) return <div className="loading" style={{ textAlign: 'center', padding: '10rem' }}>Chargement...</div>;
+  if (loading || dashboardLoading) return <div className="loading" style={{ textAlign: 'center', padding: '10rem' }}>{t('loading')}</div>;
 
   return (
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="header-logo">
-          <span className="header-page-title">Page d'accueil</span>
+          <span className="header-page-title">{t('home')}</span>
         </div>
         <div className="header-actions">
           <LanguageSwitcher />
@@ -287,7 +287,7 @@ function ProfessorDashboard() {
         <aside className="sidebar-original">
           <div className="academic-card">
             <div className="sidebar-header">
-              <h3>Mes Classes</h3>
+              <h3>{t('my_classes')}</h3>
             </div>
             <div className="flex-column">
               {classes.map(cls => (
@@ -299,7 +299,7 @@ function ProfessorDashboard() {
                   {cls.name}
                 </button>
               ))}
-              <button onClick={() => setShowNewClassForm(true)} className="btn-new-class">+ Nouvelle Classe</button>
+              <button onClick={() => setShowNewClassForm(true)} className="btn-new-class">{t('new_class')}</button>
             </div>
           </div>
         </aside>
@@ -310,13 +310,13 @@ function ProfessorDashboard() {
               <div className="class-title-row">
                 <h2>{selectedClass.name}</h2>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button onClick={handleGeneratePDF} className="btn-action-vintage btn-beige">Télécharger PDF Logins</button>
-                  <button onClick={() => setShowDeleteConfirm(true)} className="btn-action-vintage btn-red">Supprimer Classe</button>
+                  <button onClick={handleGeneratePDF} className="btn-action-vintage btn-beige">{t('download_pdf')}</button>
+                  <button onClick={() => setShowDeleteConfirm(true)} className="btn-action-vintage btn-red">{t('delete_class')}</button>
                 </div>
               </div>
 
               <section>
-                <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '1.5rem' }}>Leaderboard</h3>
+                <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '1.5rem' }}>{t('leaderboard')}</h3>
                 <div 
                   className="leaderboard-grid"
                   style={{ gridTemplateColumns: `repeat(${getGridCols(selectedClass.houseNames?.length)}, 1fr)` }}
@@ -331,7 +331,7 @@ function ProfessorDashboard() {
                         }}>
                           {selectedClass.housePoints?.[idx] || 0}
                         </p>
-                        <span className="score-tag">points</span>
+                        <span className="score-tag">{t('points')}</span>
                       </div>
                       <div className="house-footer-actions">
                         <div className="point-btns-row">
@@ -360,7 +360,7 @@ function ProfessorDashboard() {
                             <button onClick={() => setActiveInlineCustom(null)} className="inline-action-btn btn-inline-x">✕</button>
                           </div>
                         ) : (
-                          <button onClick={() => setActiveInlineCustom(idx)} className="btn-custom-inline">⚙ Personnalisé</button>
+                          <button onClick={() => setActiveInlineCustom(idx)} className="btn-custom-inline">{t('custom_points')}</button>
                         )}
                         
                         <button onClick={() => openPointModal(idx, -1)} className="btn-minus-one">-1</button>
@@ -372,33 +372,33 @@ function ProfessorDashboard() {
 
               <section>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ fontFamily: 'var(--font-serif)' }}>Élèves ({students.length})</h3>
+                  <h3 style={{ fontFamily: 'var(--font-serif)' }}>{t('students')} ({students.length})</h3>
                   <button
                     onClick={() => setShowAddStudentForm(!showAddStudentForm)}
                     className="btn-action-vintage btn-red"
                     style={{ padding: '0.6rem 1.5rem' }}
                   >
-                    {showAddStudentForm ? '✕' : '+'} Ajouter Élève
+                    {showAddStudentForm ? '✕' : '+ ' + t('add_student')}
                   </button>
                 </div>
 
                 {showAddStudentForm && (
                   <div className="registration-fiche-vintage">
                     <div className="fiche-header-academic">
-                      <span>Nouvelle Inscription</span>
+                      <span>{t('new_registration')}</span>
                     </div>
                     <form onSubmit={handleAddStudent} className="fiche-body-academic">
                       <div className="fiche-inputs-row">
                         <div className="input-field-buvard">
-                          <label>Prénom</label>
+                          <label>{t('first_name')}</label>
                           <input type="text" placeholder="..." value={studentFirstName} onChange={(e) => setStudentFirstName(e.target.value)} required />
                         </div>
                         <div className="input-field-buvard">
-                          <label>Nom</label>
+                          <label>{t('last_name')}</label>
                           <input type="text" placeholder="..." value={studentName} onChange={(e) => setStudentName(e.target.value)} required />
                         </div>
                         <div className="input-field-buvard">
-                          <label>Maison</label>
+                          <label>{t('house')}</label>
                           <select value={studentHouse} onChange={(e) => setStudentHouse(Number(e.target.value))}>
                             {selectedClass.houseNames?.map((name, i) => (
                               <option key={i} value={i}>{name}</option>
@@ -407,8 +407,8 @@ function ProfessorDashboard() {
                         </div>
                       </div>
                       <div className="fiche-actions-vintage">
-                        <button type="submit" className="btn-confirm-gold">Inscrire l'élève</button>
-                        <button type="button" onClick={() => setShowAddStudentForm(false)} className="btn-cancel-neutral">Annuler</button>
+                        <button type="submit" className="btn-confirm-gold">{t('enroll_student')}</button>
+                        <button type="button" onClick={() => setShowAddStudentForm(false)} className="btn-cancel-neutral">{t('cancel')}</button>
                       </div>
                     </form>
                   </div>
@@ -418,7 +418,7 @@ function ProfessorDashboard() {
                   <div style={{ marginBottom: '1.5rem' }}>
                     <input
                       type="text"
-                      placeholder="Rechercher un élève dans le registre..."
+                      placeholder={t('registry_search_placeholder')}
                       className="registry-search-bar"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -428,10 +428,10 @@ function ProfessorDashboard() {
                     <table className="table-registry">
                       <thead>
                         <tr>
-                          <th>Identité</th>
-                          <th>Identifiant</th>
-                          <th>Maison</th>
-                          <th className="text-right">Action</th>
+                          <th>{t('identity')}</th>
+                          <th>{t('username_label')}</th>
+                          <th>{t('house')}</th>
+                          <th className="text-right">{t('action')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -441,7 +441,7 @@ function ProfessorDashboard() {
                             <td><code style={{ background: '#f5f5f5', padding: '0.3rem 0.6rem', borderRadius: '4px' }}>{student.username}</code></td>
                             <td>{selectedClass.houseNames[student.house]}</td>
                             <td className="text-right">
-                              <button onClick={() => handleDeleteStudent(student.id)} className="btn-action-vintage btn-red" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>Supprimer</button>
+                              <button onClick={() => handleDeleteStudent(student.id)} className="btn-action-vintage btn-red" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>{t('delete')}</button>
                             </td>
                           </tr>
                         ))}
@@ -453,7 +453,7 @@ function ProfessorDashboard() {
             </>
           ) : (
             <div className="academic-card" style={{ textAlign: 'center', padding: '5rem' }}>
-              Sélectionnez une promotion pour ouvrir le registre.
+              {t('select_class_prompt')}
             </div>
           )}
         </section>
@@ -462,20 +462,20 @@ function ProfessorDashboard() {
       {pointModal.isOpen && (
         <div className="modal-letter-overlay">
           <div className="modal-letter">
-            <h2>Justification</h2>
-            <p>Maison : <strong>{selectedClass?.houseNames[pointModal.houseIndex]}</strong></p>
+            <h2>{t('justification')}</h2>
+            <p>{t('justification_house')} <strong>{selectedClass?.houseNames[pointModal.houseIndex]}</strong></p>
             <form onSubmit={confirmAddPoints} className="flex-column">
               <input 
                 type="text" 
-                placeholder="Motif de la récompense ou sanction..." 
+                placeholder={t('justification_placeholder')}
                 className="input-paper-buvard" 
                 value={pointModal.justification} 
                 onChange={(e) => setPointModal({ ...pointModal, justification: e.target.value })} 
                 autoFocus 
               />
               <div className="stack-buttons-modal">
-                <button type="submit" className="btn-confirm-gold">Confirmer</button>
-                <button type="button" onClick={() => setPointModal({ isOpen: false, houseIndex: null, points: 0, justification: '' })} className="btn-cancel-neutral">Fermer</button>
+                <button type="submit" className="btn-confirm-gold">{t('confirm')}</button>
+                <button type="button" onClick={() => setPointModal({ isOpen: false, houseIndex: null, points: 0, justification: '' })} className="btn-cancel-neutral">{t('close')}</button>
               </div>
             </form>
           </div>
@@ -485,33 +485,33 @@ function ProfessorDashboard() {
       {showNewClassForm && (
         <div className="modal-letter-overlay">
           <div className="modal-letter modal-config-large">
-            <h2>Nouvelle Classe</h2>
+            <h2>{t('new_class_title')}</h2>
             <form onSubmit={handleCreateClass} className="flex-column" style={{ marginTop: '1.5rem' }}>
               <div className="form-section-vintage">
-                <label>Nom de la Classe</label>
+                <label>{t('class_name_label')}</label>
                 <input 
                   type="text" 
                   value={className} 
                   onChange={(e) => setClassName(e.target.value)} 
                   required 
-                  placeholder="Ex: 1ère LLCE" 
+                  placeholder={t('class_name_placeholder')}
                   className="input-paper-buvard" 
                 />
               </div>
 
               <div className="form-section-vintage">
-                <label>Nombre de Maisons (2-8)</label>
+                <label>{t('house_count_label')}</label>
                 <select 
                   className="input-paper-buvard"
                   value={houseCount}
                   onChange={(e) => updateHouseCount(e.target.value)}
                 >
-                  {[2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} maisons</option>)}
+                  {[2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} {t('houses_label')}</option>)}
                 </select>
               </div>
 
               <div className="houses-config-scroll-area">
-                <label style={{ marginBottom: '1rem', display: 'block' }}>Configuration des Maisons</label>
+                <label style={{ marginBottom: '1rem', display: 'block' }}>{t('config_houses_title')}</label>
                 <div className="houses-config-grid">
                   {houses.map((house, idx) => (
                     <div key={idx} className="house-config-item">
@@ -519,7 +519,7 @@ function ProfessorDashboard() {
                         type="text" 
                         value={house.name} 
                         onChange={(e) => updateHouseDetail(idx, 'name', e.target.value)}
-                        placeholder={`Nom Maison ${idx + 1}`}
+                        placeholder={`${t('house_label')} ${idx + 1}`}
                         className="input-mini-buvard"
                         required
                       />
@@ -535,8 +535,8 @@ function ProfessorDashboard() {
               </div>
 
               <div className="stack-buttons-modal" style={{ marginTop: '1rem' }}>
-                <button type="submit" className="btn-confirm-gold">Créer la classe</button>
-                <button type="button" onClick={() => setShowNewClassForm(false)} className="btn-cancel-neutral">Annuler</button>
+                <button type="submit" className="btn-confirm-gold">{t('create_class')}</button>
+                <button type="button" onClick={() => setShowNewClassForm(false)} className="btn-cancel-neutral">{t('cancel')}</button>
               </div>
             </form>
           </div>
@@ -546,13 +546,13 @@ function ProfessorDashboard() {
       {showDeleteConfirm && (
         <div className="modal-letter-overlay">
           <div className="modal-letter modal-delete-warning">
-            <h2 className="modal-title-serious">AVERTISSEMENT</h2>
+            <h2 className="modal-title-serious">{t('warning')}</h2>
             <p style={{ marginTop: '1rem', fontFamily: 'var(--font-sans)', color: '#666' }}>
-              Voulez-vous vraiment supprimer cette classe ?
+              {t('delete_class_warning')}
             </p>
             <div className="stack-buttons-modal" style={{ marginTop: '2rem' }}>
-              <button onClick={() => setShowDeleteConfirm(false)} className="btn-cancel-neutral">Conserver</button>
-              <button onClick={handleDeleteClass} className="btn-delete-confirmed">Supprimer</button>
+              <button onClick={() => setShowDeleteConfirm(false)} className="btn-cancel-neutral">{t('keep')}</button>
+              <button onClick={handleDeleteClass} className="btn-delete-confirmed">{t('delete_confirm_btn')}</button>
             </div>
           </div>
         </div>

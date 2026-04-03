@@ -81,17 +81,17 @@ function StudentDashboard() {
     return 4;
   };
 
-  if (loading || dashboardLoading) return <div className="dashboard loading" style={{ textAlign: 'center', padding: '10rem' }}>Chargement...</div>;
+  if (loading || dashboardLoading) return <div className="dashboard loading" style={{ textAlign: 'center', padding: '10rem' }}>{t('loading')}</div>;
 
   if (!studentInfo || !classInfo) {
-    return <div className="dashboard-content" style={{ textAlign: 'center', padding: '5rem' }}>Aucune donnée trouvée.</div>;
+    return <div className="dashboard-content" style={{ textAlign: 'center', padding: '5rem' }}>{t('no_data')}</div>;
   }
 
   return (
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="header-logo">
-          <span className="header-page-title">Page de suivi</span>
+          <span className="header-page-title">{getTranslation(language, 'professor', 'home')}</span>
         </div>
         <div className="header-actions">
           <LanguageSwitcher />
@@ -105,7 +105,7 @@ function StudentDashboard() {
         {/* LIGNE 1 : LEADERBOARD PLEIN ECRAN */}
         <section style={{ marginBottom: '3rem' }}>
           <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '1.5rem', color: 'var(--primary-sepia)', fontSize: '1.4rem' }}>
-            Classement de la Promotion
+            {t('leaderboard')}
           </h3>
           <div 
             className="leaderboard-grid"
@@ -121,9 +121,9 @@ function StudentDashboard() {
                   }}>
                     {classInfo.housePoints?.[idx] || 0}
                   </p>
-                  <span className="score-tag">points</span>
+                  <span className="score-tag">{t('points')}</span>
                 </div>
-                {idx === studentInfo.house && <div className="my-house-indicator">Ma Maison</div>}
+                {idx === studentInfo.house && <div className="my-house-indicator">{getTranslation(language, 'student', 'my_house')}</div>}
               </div>
             ))}
           </div>
@@ -135,12 +135,12 @@ function StudentDashboard() {
           {/* Fiche d'Honneur */}
           <div className="registration-fiche-vintage">
             <div className="fiche-header-academic">
-              <span>Ma Fiche d'Honneur</span>
+              <span>{t('my_profile')}</span>
             </div>
             <div className="fiche-body-academic" style={{ padding: '2.5rem' }}>
               <div className="fiche-profile-layout">
                 <div className="house-emblem-student" style={{ borderColor: classInfo.houseColors[studentInfo.house] }}>
-                  <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', opacity: 0.8 }}>Maison</span>
+                  <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', opacity: 0.8 }}>{getTranslation(language, 'professor', 'house')}</span>
                   <strong style={{ color: classInfo.houseColors[studentInfo.house], fontSize: '1.1rem' }}>
                     {classInfo.houseNames[studentInfo.house]}
                   </strong>
@@ -150,7 +150,7 @@ function StudentDashboard() {
                     {studentInfo.firstName} {studentInfo.lastName}
                   </h2>
                   <p className="student-class-info">
-                    Classe : <strong>{classInfo.name}</strong>
+                    {t('class')} <strong>{classInfo.name}</strong>
                   </p>
                 </div>
               </div>
@@ -160,17 +160,17 @@ function StudentDashboard() {
           {/* Historique Purifié */}
           <section className="academic-registry-card" style={{ padding: '2rem' }}>
             <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '1.5rem', borderBottom: '1px solid #EEE', paddingBottom: '0.5rem' }}>
-              Historique des points
+              {getTranslation(language, 'admin', 'statistics')}
             </h3>
             {pointHistory.length === 0 ? (
-              <p className="empty-state">Aucun historique disponible.</p>
+              <p className="empty-state">{getTranslation(language, 'professor', 'no_students')}</p>
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table className="table-registry" style={{ fontSize: '0.9rem' }}>
                   <thead>
                     <tr>
                       <th>Date</th>
-                      <th>Maison</th>
+                      <th>{getTranslation(language, 'professor', 'house')}</th>
                       <th>Variation</th>
                       <th>Motif</th>
                     </tr>
@@ -179,7 +179,7 @@ function StudentDashboard() {
                     {pointHistory.map(hist => (
                       <tr key={hist.id}>
                         <td style={{ opacity: 0.7 }}>
-                          {hist.timestamp?.toDate ? new Date(hist.timestamp.toDate()).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '...'}
+                          {hist.timestamp?.toDate ? new Date(hist.timestamp.toDate()).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' }) : '...'}
                         </td>
                         <td>
                           <span style={{ color: classInfo.houseColors[hist.houseIndex], fontWeight: 800 }}>

@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import { getTranslation } from '../config/translations';
 
-export const generatePDF = (classInfo, students = []) => {
+export const generatePDF = (classInfo, students = [], language = 'fr') => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -10,6 +10,8 @@ export const generatePDF = (classInfo, students = []) => {
   
   const pageWidth = doc.internal.pageSize.getWidth(); // 210
   const pageHeight = doc.internal.pageSize.getHeight(); // 297
+  
+  const t = (section, key) => getTranslation(language, section, key);
   
   // Paramètres de la grille (2 colonnes, 4 lignes)
   const columns = 2;
@@ -52,7 +54,7 @@ export const generatePDF = (classInfo, students = []) => {
     doc.setFont('times', 'italic');
     doc.setFontSize(8);
     doc.setTextColor(139, 111, 71);
-    doc.text(`Classe : ${classInfo.name}`, x + cardWidth / 2, y + 8, { align: 'center' });
+    doc.text(`${t('student', 'class')} : ${classInfo.name}`, x + cardWidth / 2, y + 8, { align: 'center' });
     
     // Ligne séparatrice
     doc.setLineWidth(0.5);
@@ -89,12 +91,12 @@ export const generatePDF = (classInfo, students = []) => {
     doc.setFont('Helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(101, 67, 33);
-    doc.text(`Identifiant : ${student.username || ''}`, x + 10, y + 42);
+    doc.text(`${t('professor', 'username_label')} : ${student.username || ''}`, x + 10, y + 42);
     
     doc.setFont('Helvetica', 'bold');
-    doc.text(`Mot de passe : ${student.password || ''}`, x + 10, y + 50);
+    doc.text(`${t('login', 'password')} : ${student.password || ''}`, x + 10, y + 50);
   });
   
   // Sauvegarder le PDF
-  doc.save(`${classInfo.name}-Cartes.pdf`);
+  doc.save(`${classInfo.name}-Logins.pdf`);
 };
